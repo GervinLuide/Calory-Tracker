@@ -38,6 +38,16 @@ const StorageCtrl = (function(){
                 items[id]=newItem
                 localStorage.setItem("items", JSON.stringify(items))
             }
+        },
+        deleteItemFromLS: function (id){
+            if(localStorage.getItem("items") === null){
+
+            } else {
+                let items;
+                items = JSON.parse(localStorage.getItem("items"))
+                items.splice(id,1)
+                localStorage.setItem("items", JSON.stringify(items))
+            }
         }
     }
 })();
@@ -114,7 +124,8 @@ const UICtrl = (function (){
         itemCaloriesInput: '#item-calories',
         addBtn: '.add-btn',
         updateBtn: '.update-btn',
-        totalCalories: '.total-calories'
+        totalCalories: '.total-calories',
+        delBtn:".del-btn"
     }
     return {
         populateItemList: function (items){
@@ -186,9 +197,9 @@ const App = (function(ItemCtrl,StorageCtrl, UICtrl){
         document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
         document.querySelector("ul").addEventListener("click", itemMealUpdate);
         document.querySelector(UISelectors.updateBtn).addEventListener("click", mealUpdate);
-
         // add document reload event
-        document.addEventListener('DOMContentLoaded', getItemsFromStorage)
+        document.addEventListener('DOMContentLoaded', getItemsFromStorage);
+        document.querySelector(UISelectors.delBtn).addEventListener("click",delItem);
     }
     // item add submit function
     const itemAddSubmit = function (event){
@@ -247,6 +258,16 @@ const App = (function(ItemCtrl,StorageCtrl, UICtrl){
 
 
         }
+    }
+    const delItem = function(){
+        const list = document.querySelector("#item-list")
+        const UISelectors = UICtrl.getSelectors()
+        var nodes = Array.from(list.children)
+        delID = nodes.indexOf(document.querySelector("#item-update"))
+        StorageCtrl.deleteItemFromLS(delID)
+        list.removeChild(list.children[delID])
+        document.querySelector(UISelectors.addBtn).style.display= "inline"
+        document.querySelector(UISelectors.updateBtn).style.display= "none"
     }
 
     // get items from storage
