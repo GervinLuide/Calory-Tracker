@@ -48,6 +48,9 @@ const StorageCtrl = (function(){
                 items.splice(id,1)
                 localStorage.setItem("items", JSON.stringify(items))
             }
+        },
+        clearLS: function(){
+            localStorage.clear()
         }
     }
 })();
@@ -125,7 +128,9 @@ const UICtrl = (function (){
         addBtn: '.add-btn',
         updateBtn: '.update-btn',
         totalCalories: '.total-calories',
-        delBtn:".del-btn"
+        delBtn:".del-btn",
+        clearBtn:".clear-btn",
+        back:".back-btn"
     }
     return {
         populateItemList: function (items){
@@ -200,6 +205,8 @@ const App = (function(ItemCtrl,StorageCtrl, UICtrl){
         // add document reload event
         document.addEventListener('DOMContentLoaded', getItemsFromStorage);
         document.querySelector(UISelectors.delBtn).addEventListener("click",delItem);
+        document.querySelector(UISelectors.clearBtn).addEventListener("click",clearItems);
+        document.querySelector(UISelectors.back).addEventListener("click",removeButtons);
     }
     // item add submit function
     const itemAddSubmit = function (event){
@@ -227,6 +234,8 @@ const App = (function(ItemCtrl,StorageCtrl, UICtrl){
         const UISelectors = UICtrl.getSelectors()
         if(event.target.className === "edit-item fa fa-pencil"){
             document.querySelector(UISelectors.updateBtn).style.display="inline"
+            document.querySelector(UISelectors.delBtn).style.display="inline"
+            document.querySelector(UISelectors.back).style.display="inline"
             document.querySelector(UISelectors.addBtn).style.display="none"
             event.target.parentElement.parentElement.id = "item-update"
 
@@ -255,9 +264,24 @@ const App = (function(ItemCtrl,StorageCtrl, UICtrl){
             UICtrl.clearInput()
             document.querySelector(UISelectors.addBtn).style.display="inline"
             document.querySelector(UISelectors.updateBtn).style.display="none"
-
-
         }
+    }
+    const clearItems = function () {
+        document.querySelector("#item-list").innerHTML = ""
+        StorageCtrl.clearLS()
+        const totalCalories = ItemCtrl.getTotalCalories()
+        UICtrl.showTotalCalories(totalCalories)
+    }
+    const removeButtons = function (){
+        const UISelectors = UICtrl.getSelectors()
+        const list = document.querySelector("#item-list")
+        var nodes = Array.from(list.children)
+        newID = nodes.indexOf(document.querySelector("#item-update"))
+        document.querySelector("#item-update").id = `item-${newID}`
+        document.querySelector(UISelectors.updateBtn).style.display= "none"
+        document.querySelector(UISelectors.delBtn).style.display= "none"
+        document.querySelector(UISelectors.back).style.display= "none"
+        document.querySelector(UISelectors.addBtn).style.display= "inline"
     }
     const delItem = function(){
         const list = document.querySelector("#item-list")
